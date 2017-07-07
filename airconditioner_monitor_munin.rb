@@ -171,11 +171,28 @@ class Main
 end
 
 if ARGV[0] == "config"
-  puts "graph_title 2f Airconditioner monitor"
+  puts "graph_title Airconditioner monitor"
   puts "graph_args --base 1000 -l 0"
   puts "graph_vlabel values"
   puts "graph_category life"
-  puts "graph_info Panasonic CX airconditioner monitor by echonet."
+  puts "graph_info Airconditioner monitor by echonet."
+  
+  puts "OperationStatus.label Operation Status"
+  puts "OperationStatus.type GAUGE"
+  puts "SetTemperature.label Set Temperature"
+  puts "SetTemperature.type GAUGE"
+  puts "MeasuredValueOfRoomRelativeHumidity.label Measured Value Of Room Relative Humidity"
+  puts "MeasuredValueOfRoomRelativeHumidity.type GAUGE"
+  puts "MeasuredValueOfRoomTemperature.label Measured Value Of Room Temperature"
+  puts "MeasuredValueOfRoomTemperature.type GAUGE"
+  puts "MeasuredOutdoorAirTemperature.label Measured Outdoor Air Temperature"
+  puts "MeasuredOutdoorAirTemperature.type GAUGE"
+  puts "AirFlowRateSetting.label Air Flow Rate Setting"
+  puts "AirFlowRateSetting.type GAUGE"
+  puts "AutomaticControlOfAirFlowDirectionSetting.label Automatic Control Of Air Flow Direction Setting"
+  puts "AutomaticControlOfAirFlowDirectionSetting.type GAUGE"
+  puts "AirFlowDirectionVerticalSetting.label AirFlow Direction Vertical Setting"
+  puts "AirFlowDirectionVerticalSetting.type GAUGE"
   exit 0
 end
 
@@ -185,9 +202,10 @@ aircon_eoj = BEOJ.new
 aircon_eoj.set_values 0x01,0x30,0x03
 m = Main.new("192.168.33.111",aircon_eoj)
 exit 1 if m.execute == false
-data  = m.recv_data
+
+data = m.recv_data
 property = data[:edata][:property]
-print_data  = Property2MuninString.print property
+print_data = Property2MuninString.print property
 print_data.each do |val|
   puts val
 end
