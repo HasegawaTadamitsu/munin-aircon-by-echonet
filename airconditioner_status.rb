@@ -16,19 +16,6 @@ class Property2MuninString
         tmp = val.edt[0]
         data = (tmp == 0x30)? 100:0
         ret << "OperationStatus.value #{data}"
-      when 0xb3
-        val = val.edt[0]
-        ret << "SetTemperature.value #{val}"
-      when 0xba
-        val = val.edt[0]
-        ret << "MeasuredValueOfRoomRelativeHumidity.value #{val}"
-      when 0xbb
-        val = val.edt[0]
-        ret << "MeasuredValueOfRoomTemperature.value #{val}"
-      when 0xbe
-        val = val.edt[0]
-        next  if val == 0x7e  ## non measured
-        ret << "MeasuredOutdoorAirTemperature.value #{val}"
       when 0xa0
         val = val.edt[0]
         ret << "AirFlowRateSetting.value #{val}"
@@ -151,7 +138,7 @@ class Main
 
     edata = EData.new
     edata.set_values seoj,@target_eoj,EData::ESV_INF_REQ
-    command=%w( 0x80 0xb3 0xba 0xbb 0xbe 0xa0 0xa1 0xa4 )
+    command=%w( 0x80 0xa0 0xa1 0xa4 )
     command.each do | com |
       property = PropertyData.new
       property[:epc] = com.to_i(16)
@@ -179,14 +166,6 @@ if ARGV[0] == "config"
   
   puts "OperationStatus.label Operation Status"
   puts "OperationStatus.type GAUGE"
-  puts "SetTemperature.label Set Temperature"
-  puts "SetTemperature.type GAUGE"
-  puts "MeasuredValueOfRoomRelativeHumidity.label Measured Value Of Room Relative Humidity"
-  puts "MeasuredValueOfRoomRelativeHumidity.type GAUGE"
-  puts "MeasuredValueOfRoomTemperature.label Measured Value Of Room Temperature"
-  puts "MeasuredValueOfRoomTemperature.type GAUGE"
-  puts "MeasuredOutdoorAirTemperature.label Measured Outdoor Air Temperature"
-  puts "MeasuredOutdoorAirTemperature.type GAUGE"
   puts "AirFlowRateSetting.label Air Flow Rate Setting"
   puts "AirFlowRateSetting.type GAUGE"
   puts "AutomaticControlOfAirFlowDirectionSetting.label Automatic Control Of Air Flow Direction Setting"
