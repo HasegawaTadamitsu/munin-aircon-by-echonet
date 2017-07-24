@@ -12,19 +12,15 @@ class Property2MuninString
     property.each do |val|
       epc =val.epc
       case epc
-      when 0xb3
-        val = val.edt[0]
-        next  if val <  0 or 50 < val
-        ret << "SetTemperature.value #{val}"
-      when 0xbb
-        val = val.edt[0]
-        ret << "MeasuredValueOfRoomTemperature.value #{val}"
-      when 0xbe
-        val = val.edt[0]
-        next  if val == 0x7e  ## non measured
-        ret << "MeasuredOutdoorAirTemperature.value #{val}"
+      when 0x85
+        val1 = val.edt[0]
+        val2 = val.edt[1]
+        val3 = val.edt[2]
+        val4 = val.edt[3]
+        total = (val4  + val3 * 2^8 + val2 * 2^16 + val1 * 2^32) * 0.001
+        ret << "MeasuredCumulativePowerConsumption.value #{total}"
       else
-        # nothing
+        ## nothing
       end ## end of case
     end  ## end of property each
     return ret
@@ -95,11 +91,8 @@ class Main
     @target_eoj = arg_eoj
     
     @udps = UDPSocket.open()
-   @udps.bind("0.0.0.0",3610)
-   mreq = IPAddr.new("224.0.23.0").hton + IPAddr.new("0.0.0.0").hton
-#    @udps.bind("192.168.33.202",3610)
-#    mreq = IPAddr.new("224.0.23.0").hton + IPAddr.new("0.0.0.0").hton
-
+    @udps.bind("0.0.0.0",3610)
+    mreq = IPAddr.new("224.0.23.0").hton + IPAddr.new("0.0.0.0").hton
     @udps.setsockopt(Socket::IPPROTO_IP, Socket::IP_ADD_MEMBERSHIP, mreq)
   end
 
@@ -140,7 +133,7 @@ class Main
 
     edata = EData.new
     edata.set_values seoj,@target_eoj,EData::ESV_INF_REQ
-    command=%w( 0xb3 0xbb 0xbe )
+    command=%w( 0x85 )
     command.each do | com |
       property = PropertyData.new
       property[:epc] = com.to_i(16)
@@ -160,25 +153,20 @@ class Main
 end
 
 if ARGV[0] == "config"
-  puts "graph_title Airconditioner temp"
+  puts "graph_title Airconditioner Cumulative Power Consumption monitor"
   puts "graph_args --base 1000 -l 0"
   puts "graph_vlabel values"
   puts "graph_category life"
-  puts "graph_info Airconditioner temp by echonet."
-  
-  puts "SetTemperature.label Set Temperature"
-  puts "SetTemperature.type GAUGE"
-  puts "MeasuredValueOfRoomTemperature.label Measured Value Of Room Temperature"
-  puts "MeasuredValueOfRoomTemperature.type GAUGE"
-  puts "MeasuredOutdoorAirTemperature.label Measured Outdoor Air Temperature"
-  puts "MeasuredOutdoorAirTemperature.type GAUGE"
+  puts "graph_info Airconditioner monitor by echonet."
+  puts "MeasuredCumulativePowerConsumption.label Measured Cumulative Power Consumption kWh"
+  puts "MeasuredCumulativePowerConsumption.type GAUGE"
   exit 0
 end
 
 
 aircon_eoj = BEOJ.new
-aircon_eoj.set_values 0x01,0x30,0x03      # change here !
-m = Main.new("192.168.33.111",aircon_eoj) #change here !
+aircon_eoj.set_values 0x01,0x30,0x03
+m = Main.new("192.168.33.111",aircon_eoj)
 exit 1 if m.execute == false
 
 data = m.recv_data
