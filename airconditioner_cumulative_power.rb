@@ -17,7 +17,7 @@ class Property2MuninString
         val2 = val.edt[1]
         val3 = val.edt[2]
         val4 = val.edt[3]
-        total = (val4  + val3 * 2^8 + val2 * 2^16 + val1 * 2^32) * 0.001
+        total = (val4  + val3 * 2^8 + val2 * 2^16 + val1 * 2^24) * 0.001
         ret << "MeasuredCumulativePowerConsumption.value #{total}"
       else
         ## nothing
