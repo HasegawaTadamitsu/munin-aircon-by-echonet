@@ -17,7 +17,9 @@ class Property2MuninString
         val2 = val.edt[1]
         val3 = val.edt[2]
         val4 = val.edt[3]
-        total = (val4  + val3 * 2^8 + val2 * 2^16 + val1 * 2^24) * 0.001
+        total = (val4.to_f  + val3.to_f*(2.0**8) +
+                              val2.to_f*(2.0**16) +
+                              val1.to_f*(2.0**24) ) * 0.001
         ret << "MeasuredCumulativePowerConsumption.value #{total}"
       else
         ## nothing
@@ -114,7 +116,7 @@ class Main
           if  @recv_data[:tid] == @tid and ip_addr.ip_address == @send_ip
             return true
           end
-          puts  "recev other data #{ip_addr.ip_address},#{@recv_data[:tid]}"
+#          puts  "recev other data #{ip_addr.ip_address},#{@recv_data[:tid]}"
         end # end of times loop
       end # timeout
     rescue Timeout::Error => e
