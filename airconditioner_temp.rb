@@ -18,10 +18,12 @@ class Property2MuninString
         ret << "SetTemperature.value #{val}"
       when 0xbb
         val = val.edt[0]
+        if val > 127 then val = 256 - val end
         ret << "MeasuredValueOfRoomTemperature.value #{val}"
       when 0xbe
         val = val.edt[0]
         next  if val == 0x7e  ## non measured
+        if val > 127 then val = 256 - val end
         ret << "MeasuredOutdoorAirTemperature.value #{val}"
       else
         # nothing
